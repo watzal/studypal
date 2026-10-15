@@ -1,0 +1,45 @@
+# Render Blueprint: Dashboard -> New -> Blueprint -> pick this repo.
+#
+#   studypal-gemma  Gemma 3 4B on llama.cpp (CPU). Render is the AI runtime.
+#   studypal        FastAPI + the React reader, talking to Gemma over Render's
+#                   private network, with a disk for uploaded books and the cache.
+#
+# Both are in Singapore, the closest region to India; private networking
+# needs them in the same region.
+services:
+  - type: web
+    name: studypal-gemma
+    runtime: docker
+    region: singapore
+    plan: 2c-4g            # 4 GB fits the 4B model; 4c-8g is ~2x faster per page
+    dockerfilePath: ./llm/Dockerfile
+    dockerContext: ./llm
+    healthCheckPath: /health
+    envVars:
+      - key: LLAMA_API_KEY
+        generateValue: true
+
+  - type: web
+    name: studypal
+    runtime: docker
+    region: singapore
+    plan: 0.5c-512mb
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/books
+    disk:
+      name: studypal-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: STUDYPAL_LLM_HOSTPORT
+        fromService:
+          type: web
+          name: studypal-gemma
+          property: hostport
+      - key: STUDYPAL_LLM_KEY
+        fromService:
+          type: web
+          name: studypal-gemma
+          envVarKey: LLAMA_API_KEY
+      - key: STUDYPAL_LLM_TIMEOUT
+        value: "300"      # CPU inference: a dense page can take a minute

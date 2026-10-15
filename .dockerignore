@@ -1,0 +1,14 @@
+**/node_modules
+**/__pycache__
+.pytest_cache
+.git
+static
+data
+llm
+tests
+*.pdf
+*.json
+!web/package.json
+!web/package-lock.json
+!web/tsconfig.json
+*.db

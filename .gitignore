@@ -1,0 +1,14 @@
+# Books: NCERT PDFs are "not to be republished"; tests build their own sample.
+*.pdf
+*_highlighted.json
+lebo107_gemma.json
+
+# Runtime data and caches
+data/
+*.db
+__pycache__/
+.pytest_cache/
+
+# Frontend
+web/node_modules/
+static/

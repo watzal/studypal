@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme tokens as RGB triplets so Tailwind can apply opacity (bg-accent/10). */
+:root {
+  --bg: 246 244 239;
+  --surface: 255 255 255;
+  --raised: 250 249 246;
+  --line: 229 225 216;
+  --ink: 28 27 25;
+  --muted: 112 107 99;
+  --accent: 13 116 104;
+  --accent-ink: 255 255 255;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: 16 17 19;
+    --surface: 24 25 28;
+    --raised: 31 32 36;
+    --line: 46 47 53;
+    --ink: 236 235 232;
+    --muted: 156 153 147;
+    --accent: 94 211 186;
+    --accent-ink: 8 28 24;
+    color-scheme: dark;
+  }
+}
+
+/* Highlight colours. The page itself stays white in both themes, so these do too. */
+.t-concept    { --c: 255 212 59;  --c-strong: 230 140 0; }
+.t-definition { --c: 116 192 252; --c-strong: 28 126 214; }
+.t-fact       { --c: 140 233 154; --c-strong: 47 158 68; }
+.t-formula    { --c: 99 230 190;  --c-strong: 12 133 153; }
+.t-example    { --c: 250 162 193; --c-strong: 214 51 108; }
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; }
+  body { @apply bg-bg text-ink font-sans antialiased; font-feature-settings: "cv11", "ss01"; }
+  ::selection { background: rgb(var(--accent) / .22); }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; }
+}
+
+@layer components {
+  /* A highlight drawn on the real page. Multiply keeps the print legible underneath. */
+  .hl {
+    position: absolute;
+    border-radius: 3px;
+    background: rgb(var(--c) / .5);
+    mix-blend-mode: multiply;
+    transform-origin: left center;
+    animation: hl-sweep .55s cubic-bezier(.2, .7, .2, 1) both;
+    transition: background-color .15s, box-shadow .15s;
+    cursor: pointer;
+  }
+  .hl:hover, .hl[data-hover="true"] { background: rgb(var(--c) / .72); }
+  .hl[data-active="true"] {
+    background: rgb(var(--c) / .78);
+    box-shadow: 0 0 0 2px rgb(var(--c-strong) / .9);
+  }
+  .hl:focus-visible { outline: 2px solid rgb(var(--c-strong)); outline-offset: 2px; }
+
+  .swatch { background: rgb(var(--c)); }
+  .swatch-strong { color: rgb(var(--c-strong)); }
+  .bar-c { background: rgb(var(--c-strong)); }
+
+  .scrollbar-thin { scrollbar-width: thin; scrollbar-color: rgb(var(--line)) transparent; }
+
+  .shimmer {
+    background: linear-gradient(90deg, rgb(var(--line) / .55) 0%, rgb(var(--line)) 50%, rgb(var(--line) / .55) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+  }
+
+  /* "Gemma is reading this page" scan line. */
+  .scan {
+    background: linear-gradient(180deg, transparent, rgb(var(--accent) / .18) 70%, rgb(var(--accent) / .55));
+    animation: scan 2.2s cubic-bezier(.45, 0, .55, 1) infinite;
+  }
+}
+
+@keyframes hl-sweep { from { transform: scaleX(0); opacity: 0; } to { transform: scaleX(1); opacity: 1; } }
+@keyframes shimmer { to { background-position: -200% 0; } }
+@keyframes scan { 0% { top: -12%; } 100% { top: 100%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hl, .shimmer, .scan { animation: none !important; }
+}
